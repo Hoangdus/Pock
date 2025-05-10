@@ -68,7 +68,7 @@ void prefThings(){
 		[self.pockIconScrollView addSubview: arg1];
 		[self addSubview: self.pockIconScrollView];
 
-		//make a clone of the views to use outside of the class
+		//make a pointer of the views to use outside of the class
 		cPockIconScrollView = self.pockIconScrollView;
 		// cSBDockView = self;
 
@@ -89,12 +89,13 @@ void prefThings(){
 
 	-(void)didMoveToWindow{
 		%orig;
+		NSInteger iconCount = [[self icons] count];
 		if(isVerticalPageEnabled){
 			touchableHeight = 750;
 			cPockIconScrollView.contentSize = CGSizeMake(375, touchableHeight);
 			return;
 		}
-		touchableWidth = [self calculateDockWidth:infiniteSpacing dockPaging:isDockPagingEnabled]; //hacky way to set SBRootFolderDockIconListView width		
+		touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:isDockPagingEnabled]; //hacky way to set SBDockView width		
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
 		// [self setFrame:CGRectZero];
 	}
@@ -124,18 +125,43 @@ void prefThings(){
 
 	//set touchable area width and UIScrollView contentWidth after finish editting homescreen
 	-(void)setEditing:(BOOL)arg1{
+		NSInteger iconCount = [[self icons] count];
 		%orig;
 		if(isVerticalPageEnabled){
 			return;
 		}
 		if(arg1 && isDockPagingEnabled && disablePagingWhenEditing){
 			cPockIconScrollView.pagingEnabled = false;
+			return;
 		}
 		if(!arg1 && isDockPagingEnabled && disablePagingWhenEditing){
 			cPockIconScrollView.pagingEnabled = true;
 		}
-		touchableWidth = [self calculateDockWidth:infiniteSpacing dockPaging:isDockPagingEnabled]; //hacky way to set SBRootFolderDockIconListView width		
+
+		//hacky way to set SBDockView width
+		if(arg1){
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount+1 dockPaging:isDockPagingEnabled];
+		}else{
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:isDockPagingEnabled]; 
+		}
+
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
+		[self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, touchableWidth, self.frame.size.height)];
+	}
+
+	//recalculate touchable area width and UIScrollView contentWidth after adding icon when editting homescreen 
+	//also fixes jailbreak only app icon reappearing after rejailbreak 
+	-(void)iconList:(id)arg1 didAddIcon:(id)arg2{
+		%orig;
+		NSInteger iconCount = [[self icons] count];
+		if([self isEditing]){
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount+1 dockPaging:isDockPagingEnabled]; 
+		}else{
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:isDockPagingEnabled]; 
+		}
+
+		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
+		[self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, touchableWidth, self.frame.size.height)];
 	}
 
 	// -(void)setIconSpacing:(CGSize)arg1{
@@ -191,9 +217,8 @@ void prefThings(){
 	}
 
 	%new
-	-(CGFloat)calculateDockWidth:(CGFloat)iconSpacing dockPaging:(bool)dockPaging{
+	-(CGFloat)calculateDockFrameWidth:(CGFloat)iconSpacing iconCount:(NSInteger)iconCount dockPaging:(bool)dockPaging{
 		CGSize iconSize = [self alignmentIconSize];
-		NSInteger iconCount = [[self icons] count];
 		if(!dockPaging){
 			return iconCount * (iconSize.width + iconSpacing) + iconSpacing;
 		}

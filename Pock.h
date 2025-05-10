@@ -21,6 +21,7 @@ typedef struct SBIconCoordinate {
 	-(double)verticalIconPadding;
 	-(double)horizontalIconPadding;
 	-(double)sideIconInset;
+	-(BOOL)isEditing;
 @end
 
 @interface SBDockIconListView : SBIconListView
@@ -30,7 +31,7 @@ typedef struct SBIconCoordinate {
 
 @interface SBRootFolderDockIconListView : SBDockIconListView
     @property (nonatomic,readonly) CGSize alignmentIconSize;
-	-(CGFloat)calculateDockWidth:(CGFloat)iconSpacing dockPaging:(bool)dockPaging;
+	-(CGFloat)calculateDockFrameWidth:(CGFloat)iconSpacing iconCount:(NSInteger)iconCount dockPaging:(bool)dockPaging;
 @end
 
 @interface SBIconListGridLayoutConfiguration : NSObject
