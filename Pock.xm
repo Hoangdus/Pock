@@ -5,6 +5,9 @@ bool isDockPagingEnabled = false;
 bool showScrollingIndicator = true;
 bool disablePagingWhenEditing = true;
 bool isScrollBounceEnabled = false;
+bool scrollToEndWhenEdit = false;
+bool scrollBackFromEndAfterEdit = false;
+bool animateScrollToEndWhenEdit = true;
 bool isVerticalPageEnabled = false;
 bool isDoubleRowEnabled = true;//vertical scroll only
 int iconColumns = 4;
@@ -14,6 +17,8 @@ CGFloat infiniteSpacing = 27;//only reconmended for 4 icon columns or less (27 f
 UIScrollView *cPockIconScrollView = nil;
 CGFloat touchableWidth = 375;
 CGFloat touchableHeight = 92;
+
+CGPoint oldScrollPosision = CGPointZero;
 
 void prefThings(){
 	NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.hoangdus.pockpref"];
@@ -146,6 +151,14 @@ void prefThings(){
 		}
 
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
+
+		if(arg1 && scrollToEndWhenEdit){
+			oldScrollPosision = cPockIconScrollView.contentOffset;
+			[cPockIconScrollView setContentOffset:CGPointMake(touchableWidth-375, 0) animated:animateScrollToEndWhenEdit];			
+		}else if(!arg1 && scrollToEndWhenEdit && scrollBackFromEndAfterEdit){
+			[cPockIconScrollView setContentOffset:oldScrollPosision animated:animateScrollToEndWhenEdit];			
+		}
+
 		[self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, touchableWidth, self.frame.size.height)];
 	}
 
