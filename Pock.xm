@@ -1,17 +1,22 @@
 #import "Pock.h"
 
 bool pockEnabled = false;
-bool isDockPagingEnabled = false;
-bool showScrollingIndicator = true;
-bool disablePagingWhenEditing = true;
-bool isScrollBounceEnabled = false;
+
+bool dockPaging = false;
+bool disablePagingWhenEditing = false;
+
 bool scrollToEndWhenEdit = false;
 bool scrollBackFromEndAfterEdit = false;
 bool animateScrollToEndWhenEdit = true;
-bool isVerticalPageEnabled = false;
-bool isDoubleRowEnabled = true;//vertical scroll only
+
+bool verticalPage = false;//not use for now
+bool doublePageRow = true;//vertical page only
+
 int iconColumns = 4;
 CGFloat infiniteSpacing = 27;//only reconmended for 4 icon columns or less (27 for stock ios look when at 4 col, 13 for 5 col)
+
+bool showScrollingIndicator = false;
+bool isScrollBounceEnabled = false;
 
 // SBDockView *cSBDockView = nil;
 UIScrollView *cPockIconScrollView = nil;
@@ -22,11 +27,13 @@ CGPoint oldScrollPosision = CGPointZero;
 
 void prefThings(){
 	NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.hoangdus.pockpref"];
-	pockEnabled = (prefs && [prefs objectForKey:@"isPockEnabled"] ? [[prefs valueForKey:@"isPockEnabled"] boolValue] : false );
-	isDockPagingEnabled = (prefs && [prefs objectForKey:@"isPagingEnabled"] ? [[prefs valueForKey:@"isPagingEnabled"] boolValue] : false );
-	showScrollingIndicator = (prefs && [prefs objectForKey:@"showIndicator"] ? [[prefs valueForKey:@"showIndicator"] boolValue] : false );
-	isScrollBounceEnabled = (prefs && [prefs objectForKey:@"scrollBounce"] ? [[prefs valueForKey:@"scrollBounce"] boolValue] : false );
-	disablePagingWhenEditing = (prefs && [prefs objectForKey:@"disablePagingWhenEdit"] ? [[prefs valueForKey:@"disablePagingWhenEdit"] boolValue] : false );
+	pockEnabled = (prefs && [prefs objectForKey:@"PockEnabled"] ? [[prefs valueForKey:@"PockEnabled"] boolValue] : false );
+
+	dockPaging = (prefs && [prefs objectForKey:@"PagingEnabled"] ? [[prefs valueForKey:@"PagingEnabled"] boolValue] : false );
+	disablePagingWhenEditing = (prefs && [prefs objectForKey:@"DisablePagingWhenEdit"] ? [[prefs valueForKey:@"DisablePagingWhenEdit"] boolValue] : false );
+	
+	showScrollingIndicator = (prefs && [prefs objectForKey:@"ShowIndicator"] ? [[prefs valueForKey:@"ShowIndicator"] boolValue] : false );	
+	isScrollBounceEnabled = (prefs && [prefs objectForKey:@"ScrollBounce"] ? [[prefs valueForKey:@"ScrollBounce"] boolValue] : false );
 }
 
 %group Pock
@@ -46,23 +53,23 @@ void prefThings(){
 		CGFloat frameWidth = [arg1 frame].size.width;
 		CGFloat frameHeight = 0;
 		
-		if(isVerticalPageEnabled){
+		if(verticalPage){
 			frameY = [arg1 frame].origin.y + 4;
 		}else{
 			frameY = [arg1 frame].origin.y;
 		}
 
-		if(isDoubleRowEnabled && isVerticalPageEnabled){
+		if(doublePageRow && verticalPage){
 			frameHeight = [arg1 frame].size.height * 1.75 + 3;
 		}else{
 			frameHeight = [arg1 frame].size.height;
 		}
 		
-		NSLog(@"[Pock] initWithDockListView arg1 Frame: %@", NSStringFromCGRect([arg1 frame]));
+		// NSLog(@"[Pock] initWithDockListView arg1 Frame: %@", NSStringFromCGRect([arg1 frame]));
 		self.pockIconScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(frameX, frameY, frameWidth, frameHeight)];
 		// self.pockIconScrollView.center = CGPointMake(frameWidth/2, frameHeight/2); //fix for RoundDock Remastered
 
-		self.pockIconScrollView.pagingEnabled = isDockPagingEnabled;
+		self.pockIconScrollView.pagingEnabled = dockPaging;
 		self.pockIconScrollView.bounces = isScrollBounceEnabled;
 		self.pockIconScrollView.showsHorizontalScrollIndicator = showScrollingIndicator;
 		self.pockIconScrollView.showsVerticalScrollIndicator = showScrollingIndicator;
@@ -82,7 +89,7 @@ void prefThings(){
 
 	-(double)dockHeight{
 		// NSLog(@"[Pock] orig dock height: %f", %orig);
-		if(isDoubleRowEnabled && isVerticalPageEnabled){
+		if(doublePageRow && verticalPage){
 			return %orig * 1.75;
 		}
 		return %orig;
@@ -95,12 +102,12 @@ void prefThings(){
 	-(void)didMoveToWindow{
 		%orig;
 		NSInteger iconCount = [[self icons] count];
-		if(isVerticalPageEnabled){
+		if(verticalPage){
 			touchableHeight = 750;
 			cPockIconScrollView.contentSize = CGSizeMake(375, touchableHeight);
 			return;
 		}
-		touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:isDockPagingEnabled]; //hacky way to set SBDockView width		
+		touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:dockPaging]; //hacky way to set SBDockView width		
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
 		// [self setFrame:CGRectZero];
 	}
@@ -109,11 +116,12 @@ void prefThings(){
 	-(void)setFrame:(CGRect)arg1{
 		// NSLog(@"[Pock] setFrame arg 1: %@", NSStringFromCGRect(arg1));
 		// NSLog(@"[Pock] is dock: %d", [self isDock]);
-		if(isVerticalPageEnabled){
+		%orig;
+		if(verticalPage){
 			if(arg1.origin.y == 4 && (arg1.size.height == 92 || arg1.size.height == 164)){
 				CGRect newFrame = CGRectMake(arg1.origin.x , arg1.origin.y - 4, arg1.size.width, touchableHeight); // hacky way to set width 
 				// NSLog(@"[Pock] arg 1: %@", NSStringFromCGRect(arg1));
-				NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
+				// NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
 				%orig(newFrame);
 				return;
 			}
@@ -121,33 +129,32 @@ void prefThings(){
 
 		if(arg1.size.height == 92){
 			CGRect newFrame = CGRectMake(arg1.origin.x , arg1.origin.y, touchableWidth, arg1.size.height); // hacky way to set width 
-			NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
+			// NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
 			%orig(newFrame);
 			return;
 		}
-		%orig;
 	}
 
 	//set touchable area width and UIScrollView contentWidth after finish editting homescreen
 	-(void)setEditing:(BOOL)arg1{
 		NSInteger iconCount = [[self icons] count];
 		%orig;
-		if(isVerticalPageEnabled){
+		
+		if(verticalPage){
 			return;
 		}
-		if(arg1 && isDockPagingEnabled && disablePagingWhenEditing){
+
+		if(arg1 && dockPaging && disablePagingWhenEditing){
 			cPockIconScrollView.pagingEnabled = false;
-			return;
-		}
-		if(!arg1 && isDockPagingEnabled && disablePagingWhenEditing){
+		}else if(dockPaging && disablePagingWhenEditing){
 			cPockIconScrollView.pagingEnabled = true;
 		}
 
 		//hacky way to set SBDockView width
 		if(arg1){
-			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount+1 dockPaging:isDockPagingEnabled];
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount+1 dockPaging:dockPaging];
 		}else{
-			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:isDockPagingEnabled]; 
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:dockPaging]; 
 		}
 
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
@@ -168,9 +175,9 @@ void prefThings(){
 		%orig;
 		NSInteger iconCount = [[self icons] count];
 		if([self isEditing]){
-			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount+1 dockPaging:isDockPagingEnabled]; 
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount+1 dockPaging:dockPaging]; 
 		}else{
-			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:isDockPagingEnabled]; 
+			touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:dockPaging]; 
 		}
 
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
@@ -178,7 +185,7 @@ void prefThings(){
 	}
 
 	// -(void)setIconSpacing:(CGSize)arg1{
-	// 	if(isVerticalPageEnabled || !isDockPagingEnabled){
+	// 	if(verticalPage || !dockPaging){
 	// 		%orig(CGSizeMake(20, arg1.height));
 	// 	}else{
 	// 		%orig;
@@ -187,12 +194,12 @@ void prefThings(){
 
 	//column(icon) position when editting homescreem
 	-(unsigned long long)columnAtPoint:(CGPoint)arg1 metrics:(id)arg2 fractionOfDistanceThroughColumn:(double*)arg3{
-		if (isVerticalPageEnabled){
+		if (verticalPage){
 			return %orig;	
 		}
 		CGSize iconSize = [self alignmentIconSize];
 		unsigned long long columnPoint = (arg1.x - infiniteSpacing)/(iconSize.width + infiniteSpacing);
-		if(isDockPagingEnabled){
+		if(dockPaging){
 			int pageNumber = ceil(arg1.x/cPockIconScrollView.frame.size.width);
 			CGFloat offset = (cPockIconScrollView.frame.size.width - (iconSize.width + infiniteSpacing) * iconColumns)/2;
 			CGFloat newX = offset * ((pageNumber - 1) * 2 -1);
@@ -209,7 +216,7 @@ void prefThings(){
 
 	// column(icon) position(spacing)
 	-(CGPoint)originForIconAtCoordinate:(SBIconCoordinate)arg1 metrics:(id)arg2{
-		if(isVerticalPageEnabled){
+		if(verticalPage){
 			return %orig;	
 		}
 
@@ -218,7 +225,7 @@ void prefThings(){
 		CGFloat x = ((iconSize.width + infiniteSpacing) * (arg1.col - 1)) + infiniteSpacing;
 		// NSLog(@"[Pock] x point: %f", [self horizontalIconPadding]);
 		CGFloat y = %orig.y;
-		if(isDockPagingEnabled){
+		if(dockPaging){
 			//thanks Nepeta for the math 
 			CGFloat offset = (cPockIconScrollView.frame.size.width - (iconSize.width + infiniteSpacing) * iconColumns)/2;//add an offset for every 4 icons (big space every 4 icons)
 			x = offset * (ceil((arg1.col - 1) / iconColumns) * 2 + 1);
@@ -248,7 +255,7 @@ void prefThings(){
 	//set the number of icons aka iconColumns
 	-(unsigned long long)numberOfPortraitColumns{
 		NSUInteger rows = MSHookIvar<NSUInteger>(self, "_numberOfPortraitRows");
-		if (rows == 1 && !isVerticalPageEnabled){
+		if (rows == 1 && !verticalPage){
 			return(1000);
 		}
 		return %orig;
@@ -258,14 +265,13 @@ void prefThings(){
 	// set number of rows
 	-(unsigned long long)numberOfPortraitRows{
 		NSUInteger rows = MSHookIvar<NSUInteger>(self, "_numberOfPortraitRows");
-		if (rows == 1 && isVerticalPageEnabled){
+		if (rows == 1 && verticalPage){
 			return(1000);
 		}
 		return %orig;
 	}
 
 %end 
-
 %end
 
 %ctor{

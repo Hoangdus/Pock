@@ -20,7 +20,7 @@
 			<key>PostNotification</key>
 			<string>com.hoangdus.pockpref-updated</string>
 			<key>key</key>
-			<string>isPockEnabled</string>
+			<string>PockEnabled</string>
 			<key>label</key>
 			<string>ENABLED</string>
 		</dict>
@@ -40,7 +40,7 @@
 			<key>PostNotification</key>
 			<string>com.hoangdus.pockpref-updated</string>
 			<key>key</key>
-			<string>isPagingEnabled</string>
+			<string>DockPagingEnabled</string>
 			<key>label</key>
 			<string>DOCK_PAGING</string>
 		</dict>
@@ -54,7 +54,7 @@
 			<key>PostNotification</key>
 			<string>com.hoangdus.pockpref-updated</string>
 			<key>key</key>
-			<string>showIndicator</string>
+			<string>ShowIndicator</string>
 			<key>label</key>
 			<string>SHOW_SCROLLING_INDICATOR</string>
 		</dict>
@@ -68,7 +68,7 @@
 			<key>PostNotification</key>
 			<string>com.hoangdus.pockpref-updated</string>
 			<key>key</key>
-			<string>scrollBounce</string>
+			<string>ScrollBounce</string>
 			<key>label</key>
 			<string>SCROLL_BOUNCE</string>
 		</dict>
@@ -82,7 +82,7 @@
 			<key>PostNotification</key>
 			<string>com.hoangdus.pockpref-updated</string>
 			<key>key</key>
-			<string>disablePagingWhenEdit</string>
+			<string>DisablePagingWhenEdit</string>
 			<key>label</key>
 			<string>DISABLE_PAGING_WHEN_EDIT</string>
 		</dict>
