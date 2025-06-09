@@ -17,12 +17,13 @@ CGFloat infiniteSpacing = 27;//only reconmended for 4 icon columns or less (27 f
 
 bool showScrollingIndicator = false;
 bool isScrollBounceEnabled = false;
+bool snapToIcon = false;
 
 // SBDockView *cSBDockView = nil;
 UIScrollView *cPockIconScrollView = nil;
 CGFloat touchableWidth = 375;
 CGFloat touchableHeight = 92;
-
+CGFloat iconSizeWidth = 0;
 CGPoint oldScrollPosision = CGPointZero;
 
 void prefThings(){
@@ -43,13 +44,32 @@ void prefThings(){
 
 	showScrollingIndicator = (prefs && [prefs objectForKey:@"ShowIndicator"] ? [[prefs valueForKey:@"ShowIndicator"] boolValue] : false );	
 	isScrollBounceEnabled = (prefs && [prefs objectForKey:@"ScrollBounce"] ? [[prefs valueForKey:@"ScrollBounce"] boolValue] : false );
+	snapToIcon = (prefs && [prefs objectForKey:@"SnapToIcon"] ? [[prefs valueForKey:@"SnapToIcon"] boolValue] : false );
 }
 
 %group Pock
+
+@implementation PockIconScrollViewDelegate
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+	//thanks nepeta
+    CGFloat iconWidth = iconSizeWidth + infiniteSpacing;
+    NSInteger index = floor((targetContentOffset->x - infiniteSpacing) / iconWidth);
+
+    if (((targetContentOffset->x - infiniteSpacing) - (floor(targetContentOffset->x / iconWidth) * iconWidth)) > iconWidth/3) {
+        index++;
+    }
+
+    targetContentOffset->x = index * iconWidth;
+}
+
+@end
+
 //TODO: icon snapping when dockPaging is off
 %hook SBDockView
 	
 	%property (nonatomic, retain) UIScrollView *pockIconScrollView;
+	%property (nonatomic, retain) PockIconScrollViewDelegate *pockIconScrollViewDelegate;
 
 	-(id)initWithDockListView:(id)arg1 forSnapshot:(BOOL)arg2{
 		%orig;
@@ -84,7 +104,12 @@ void prefThings(){
 		self.pockIconScrollView.showsVerticalScrollIndicator = showScrollingIndicator;
 		self.pockIconScrollView.layer.masksToBounds = YES;
 		self.pockIconScrollView.translatesAutoresizingMaskIntoConstraints = NO;
-
+		
+		if(snapToIcon){
+			self.pockIconScrollViewDelegate = [PockIconScrollViewDelegate alloc];
+			self.pockIconScrollView.delegate = self.pockIconScrollViewDelegate;
+		}
+		
 		//setup the views
 		[self.pockIconScrollView addSubview: arg1];
 		[self addSubview: self.pockIconScrollView];
@@ -230,6 +255,7 @@ void prefThings(){
 		}
 
 		CGSize iconSize = [self alignmentIconSize];
+		iconSizeWidth = iconSize.width;
 		// CGFloat top = [%c(SBDockIconListView) defaultHeight]/2 - size.height;
 		CGFloat x = ((iconSize.width + infiniteSpacing) * (arg1.col - 1)) + infiniteSpacing;
 		// NSLog(@"[Pock] x point: %f", [self horizontalIconPadding]);

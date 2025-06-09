@@ -6,8 +6,12 @@ typedef struct SBIconCoordinate {
 	long long col;
 } SBIconCoordinate;
 
+@interface PockIconScrollViewDelegate : NSObject<UIScrollViewDelegate>
+@end
+
 @interface SBDockView : UIView
     @property (nonatomic, retain) UIScrollView *pockIconScrollView;
+	@property (nonatomic, retain) PockIconScrollViewDelegate *pockIconScrollViewDelegate;
 @end
 
 @interface SBIconListView : UIView
