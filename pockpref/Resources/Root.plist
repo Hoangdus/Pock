@@ -7,6 +7,34 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>headerCellClass</key>
+			<string>PockHeaderCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<!-- <key>label</key>
+			<string>Links</string> -->
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>twitter</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>MY_TWITTER</string>
+		</dict>
+		<dict>
+			<key>action</key>
+			<string>paypal</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>BUY_A_FANTA</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Pock</string>
 		</dict>
@@ -23,12 +51,14 @@
 			<string>PockEnabled</string>
 			<key>label</key>
 			<string>ENABLED</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Extra</string>
+			<string>PAGING</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -43,34 +73,8 @@
 			<string>DockPagingEnabled</string>
 			<key>label</key>
 			<string>DOCK_PAGING</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.hoangdus.pockpref</string>
-			<key>PostNotification</key>
-			<string>com.hoangdus.pockpref-updated</string>
-			<key>key</key>
-			<string>ShowIndicator</string>
-			<key>label</key>
-			<string>SHOW_SCROLLING_INDICATOR</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<false/>
-			<key>defaults</key>
-			<string>com.hoangdus.pockpref</string>
-			<key>PostNotification</key>
-			<string>com.hoangdus.pockpref-updated</string>
-			<key>key</key>
-			<string>ScrollBounce</string>
-			<key>label</key>
-			<string>SCROLL_BOUNCE</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -85,9 +89,145 @@
 			<string>DisablePagingWhenEdit</string>
 			<key>label</key>
 			<string>DISABLE_PAGING_WHEN_EDIT</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSStaticTextCell</string>
+			<key>label</key>
+			<string>ICON_PER_PAGE</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSegmentCell</string>
+			<key>default</key>
+			<real>1</real>
+			<key>defaults</key>
+			<string>com.hoangdus.pockpref</string>
+			<key>PostNotification</key>
+			<string>com.hoangdus.pockpref-updated</string>
+			<key>key</key>
+			<string>IconPerPage</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>validValues</key>
+			<array>
+				<real>4</real>
+				<real>5</real>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>4</string>
+				<string>5</string>
+			</array>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>EXTRA</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.hoangdus.pockpref</string>
+			<key>PostNotification</key>
+			<string>com.hoangdus.pockpref-updated</string>
+			<key>key</key>
+			<string>ScrollBounce</string>
+			<key>label</key>
+			<string>SCROLL_BOUNCE</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.hoangdus.pockpref</string>
+			<key>PostNotification</key>
+			<string>com.hoangdus.pockpref-updated</string>
+			<key>key</key>
+			<string>ShowIndicator</string>
+			<key>label</key>
+			<string>SHOW_SCROLLING_INDICATOR</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>QOL_MAYBE</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.hoangdus.pockpref</string>
+			<key>PostNotification</key>
+			<string>com.hoangdus.pockpref-updated</string>
+			<key>key</key>
+			<string>ScrollToEndWhenEdit</string>
+			<key>label</key>
+			<string>SCROLL_TO_END_WHEN_EDIT</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.hoangdus.pockpref</string>
+			<key>PostNotification</key>
+			<string>com.hoangdus.pockpref-updated</string>
+			<key>key</key>
+			<string>ScrollBackAfterEdit</string>
+			<key>label</key>
+			<string>SCROLL_BACK_AFTER_EDIT</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.hoangdus.pockpref</string>
+			<key>PostNotification</key>
+			<string>com.hoangdus.pockpref-updated</string>
+			<key>key</key>
+			<string>AnimateWhenAutoScroll</string>
+			<key>label</key>
+			<string>ANIMATE_AUTO_SCROLL</string>
+			<key>cellClass</key>
+			<string>PockSwitchCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Respring to apply changes</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Respring</string>
+			<key>action</key>
+			<string>respring:</string>
 		</dict>
 	</array>
-	<key>title</key>
-	<string>Pock</string>
 </dict>
 </plist>

@@ -29,9 +29,18 @@ void prefThings(){
 	NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.hoangdus.pockpref"];
 	pockEnabled = (prefs && [prefs objectForKey:@"PockEnabled"] ? [[prefs valueForKey:@"PockEnabled"] boolValue] : false );
 
-	dockPaging = (prefs && [prefs objectForKey:@"PagingEnabled"] ? [[prefs valueForKey:@"PagingEnabled"] boolValue] : false );
+	dockPaging = (prefs && [prefs objectForKey:@"DockPagingEnabled"] ? [[prefs valueForKey:@"DockPagingEnabled"] boolValue] : false );
 	disablePagingWhenEditing = (prefs && [prefs objectForKey:@"DisablePagingWhenEdit"] ? [[prefs valueForKey:@"DisablePagingWhenEdit"] boolValue] : false );
-	
+	iconColumns = (prefs && [prefs objectForKey:@"IconPerPage"] ? [[prefs valueForKey:@"IconPerPage"] integerValue] : 4 );
+
+	if(iconColumns == 5){
+		infiniteSpacing = 13;
+	}
+
+	scrollToEndWhenEdit = (prefs && [prefs objectForKey:@"ScrollToEndWhenEdit"] ? [[prefs valueForKey:@"ScrollToEndWhenEdit"] boolValue] : false );
+	scrollBackFromEndAfterEdit = (prefs && [prefs objectForKey:@"ScrollBackAfterEdit"] ? [[prefs valueForKey:@"ScrollBackAfterEdit"] boolValue] : false );
+	animateScrollToEndWhenEdit = (prefs && [prefs objectForKey:@"AnimateWhenAutoScroll"] ? [[prefs valueForKey:@"AnimateWhenAutoScroll"] boolValue] : false );
+
 	showScrollingIndicator = (prefs && [prefs objectForKey:@"ShowIndicator"] ? [[prefs valueForKey:@"ShowIndicator"] boolValue] : false );	
 	isScrollBounceEnabled = (prefs && [prefs objectForKey:@"ScrollBounce"] ? [[prefs valueForKey:@"ScrollBounce"] boolValue] : false );
 }
