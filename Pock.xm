@@ -18,6 +18,7 @@ CGFloat infiniteSpacing = 27;//only reconmended for 4 icon columns or less (27 f
 bool showScrollingIndicator = false;
 bool isScrollBounceEnabled = false;
 bool snapToIcon = false;
+bool disableSnapToIconWhenEdit = false;
 
 // SBDockView *cSBDockView = nil;
 UIScrollView *cPockIconScrollView = nil;
@@ -25,6 +26,9 @@ CGFloat touchableWidth = 375;
 CGFloat touchableHeight = 92;
 CGFloat iconSizeWidth = 0;
 CGPoint oldScrollPosision = CGPointZero;
+CGFloat iconWidthDivider = 0.73;
+CGFloat indexThresholdThreshold = 80;
+BOOL isEditingHomeScreen = false;
 
 void prefThings(){
 	NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.hoangdus.pockpref"];
@@ -36,6 +40,7 @@ void prefThings(){
 
 	if(iconColumns == 5){
 		infiniteSpacing = 13;
+		indexThresholdThreshold = 70;
 	}
 
 	scrollToEndWhenEdit = (prefs && [prefs objectForKey:@"ScrollToEndWhenEdit"] ? [[prefs valueForKey:@"ScrollToEndWhenEdit"] boolValue] : false );
@@ -45,6 +50,7 @@ void prefThings(){
 	showScrollingIndicator = (prefs && [prefs objectForKey:@"ShowIndicator"] ? [[prefs valueForKey:@"ShowIndicator"] boolValue] : false );	
 	isScrollBounceEnabled = (prefs && [prefs objectForKey:@"ScrollBounce"] ? [[prefs valueForKey:@"ScrollBounce"] boolValue] : false );
 	snapToIcon = (prefs && [prefs objectForKey:@"SnapToIcon"] ? [[prefs valueForKey:@"SnapToIcon"] boolValue] : false );
+	disableSnapToIconWhenEdit = (prefs && [prefs objectForKey:@"DisableSnappingWhenEdit"] ? [[prefs valueForKey:@"DisableSnappingWhenEdit"] boolValue] : false );
 }
 
 %group Pock
@@ -52,15 +58,22 @@ void prefThings(){
 @implementation PockIconScrollViewDelegate
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+	if(disableSnapToIconWhenEdit && isEditingHomeScreen){
+		return;
+	}
 	//thanks nepeta
-    CGFloat iconWidth = iconSizeWidth + infiniteSpacing;
-    NSInteger index = floor((targetContentOffset->x - infiniteSpacing) / iconWidth);
+	CGFloat iconWidth = iconSizeWidth + infiniteSpacing;
+	NSInteger index = ceil((targetContentOffset->x - infiniteSpacing) / iconWidth);
+	CGFloat indexThreshold = -((targetContentOffset->x - infiniteSpacing) - (ceil(targetContentOffset->x / iconWidth) * iconWidth));
+	// NSLog(@"[Pock] index++: %f", indexThreshold);
 
-    if (((targetContentOffset->x - infiniteSpacing) - (floor(targetContentOffset->x / iconWidth) * iconWidth)) > iconWidth/3) {
-        index++;
-    }
-
-    targetContentOffset->x = index * iconWidth;
+	if (indexThreshold < iconWidth * iconWidthDivider) {
+		targetContentOffset->x = index * iconWidth;
+	}else if(indexThreshold < indexThresholdThreshold){
+		targetContentOffset->x = (index - 1) * iconWidth;
+	}else{
+		targetContentOffset->x = index * iconWidth;
+	}
 }
 
 @end
@@ -105,11 +118,11 @@ void prefThings(){
 		self.pockIconScrollView.layer.masksToBounds = YES;
 		self.pockIconScrollView.translatesAutoresizingMaskIntoConstraints = NO;
 		
-		if(snapToIcon){
+		if(snapToIcon && !dockPaging){
 			self.pockIconScrollViewDelegate = [PockIconScrollViewDelegate alloc];
 			self.pockIconScrollView.delegate = self.pockIconScrollViewDelegate;
 		}
-		
+
 		//setup the views
 		[self.pockIconScrollView addSubview: arg1];
 		[self addSubview: self.pockIconScrollView];
@@ -173,7 +186,8 @@ void prefThings(){
 	-(void)setEditing:(BOOL)arg1{
 		NSInteger iconCount = [[self icons] count];
 		%orig;
-		
+		isEditingHomeScreen = arg1;
+
 		if(verticalPage){
 			return;
 		}
