@@ -1,9 +1,9 @@
 Package: com.hoangdus.pock
 Name: Pock
-Version: 0.0.1
+Version: 1.0.0
 Architecture: iphoneos-arm
-Description: An awesome MobileSubstrate tweak!
+Description: Infinite Icon In Dock
 Maintainer: HoangDus
 Author: HoangDus
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000)
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader
