@@ -2,7 +2,7 @@ Package: com.hoangdus.pock
 Name: Pock
 Version: 1.0.1
 Architecture: iphoneos-arm
-Description: Infinite Icon In Dock
+Description: Infinite Icons In Dock
 Maintainer: HoangDus
 Author: HoangDus
 Section: Tweaks
