@@ -210,7 +210,7 @@ void prefThings(){
 		if(arg1 && scrollToEndWhenEdit){
 			oldScrollPosision = cPockIconScrollView.contentOffset;
 			[cPockIconScrollView setContentOffset:CGPointMake(touchableWidth-375, 0) animated:animateScrollToEndWhenEdit];			
-		}else if(!arg1 && scrollToEndWhenEdit && scrollBackFromEndAfterEdit){
+		}else if(!arg1 && scrollToEndWhenEdit && scrollBackFromEndAfterEdit && [[self icons] count] != iconColumns){
 			[cPockIconScrollView setContentOffset:oldScrollPosision animated:animateScrollToEndWhenEdit];			
 		}
 
