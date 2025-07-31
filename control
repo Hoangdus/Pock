@@ -6,4 +6,4 @@ Description: Infinite Icon In Dock
 Maintainer: HoangDus
 Author: HoangDus
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000), preferenceloader
+Depends: mobilesubstrate (>= 0.9.5000), preferenceloader, com.ichitaso.iconorder
