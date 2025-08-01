@@ -12,6 +12,8 @@ typedef struct SBIconCoordinate {
 @interface SBDockView : UIView
     @property (nonatomic, retain) UIScrollView *pockIconScrollView;
 	@property (nonatomic, retain) PockIconScrollViewDelegate *pockIconScrollViewDelegate;
+
+	-(UIView *)backgroundView;
 @end
 
 @interface SBIconListView : UIView

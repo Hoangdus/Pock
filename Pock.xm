@@ -1,6 +1,8 @@
 #import "Pock.h"
 
 bool pockEnabled = false;
+bool iPhoneXFix = false;
+bool rdrEnabled = false;
 
 bool dockPaging = false;
 bool disablePagingWhenEditing = false;
@@ -33,6 +35,7 @@ BOOL isEditingHomeScreen = false;
 void prefThings(){
 	NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.hoangdus.pockpref"];
 	pockEnabled = (prefs && [prefs objectForKey:@"PockEnabled"] ? [[prefs valueForKey:@"PockEnabled"] boolValue] : false );
+	iPhoneXFix = (prefs && [prefs objectForKey:@"iPhoneXFix"] ? [[prefs valueForKey:@"iPhoneXFix"] boolValue] : false );
 
 	dockPaging = (prefs && [prefs objectForKey:@"DockPagingEnabled"] ? [[prefs valueForKey:@"DockPagingEnabled"] boolValue] : false );
 	disablePagingWhenEditing = (prefs && [prefs objectForKey:@"DisablePagingWhenEdit"] ? [[prefs valueForKey:@"DisablePagingWhenEdit"] boolValue] : false );
@@ -40,6 +43,11 @@ void prefThings(){
 
 	if(iconColumns == 5){
 		infiniteSpacing = 13;
+
+		if(iPhoneXFix){
+			infiniteSpacing = 12.5;
+		}
+
 		indexThresholdThreshold = 70;
 	}
 
@@ -51,6 +59,10 @@ void prefThings(){
 	isScrollBounceEnabled = (prefs && [prefs objectForKey:@"ScrollBounce"] ? [[prefs valueForKey:@"ScrollBounce"] boolValue] : false );
 	snapToIcon = (prefs && [prefs objectForKey:@"SnapToIcon"] ? [[prefs valueForKey:@"SnapToIcon"] boolValue] : false );
 	disableSnapToIconWhenEdit = (prefs && [prefs objectForKey:@"DisableSnappingWhenEdit"] ? [[prefs valueForKey:@"DisableSnappingWhenEdit"] boolValue] : false );
+
+	NSDictionary *rdrprefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.thomz.rounddockremasteredpreferences"];
+	rdrEnabled = (rdrprefs && [rdrprefs objectForKey:@"enableSwitch"] ? [[rdrprefs valueForKey:@"enableSwitch"] boolValue] : false );
+
 }
 
 %group Pock
@@ -142,6 +154,40 @@ void prefThings(){
 		return %orig;
 
 	}
+
+	-(void)layoutSubviews{
+		%orig;
+		if(iPhoneXFix){
+			UIView *backgroundView = [self backgroundView];
+			// self.pockIconScrollView.layer.cornerRadius = backgroundView.layer.cornerRadius;
+			// if(@available(iOS 13.0, *)){
+			// 	self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
+			// }
+
+
+			CALayer *maskLayer = [CALayer layer];
+			CGFloat maskHeight = backgroundView.frame.size.height;
+			maskLayer.frame = self.bounds;
+			
+			NSString *RDRDylib = @"/var/jb/usr/lib/TweakInject/RoundDockRemastered.dylib";
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+
+			if ([fileManager fileExistsAtPath:RDRDylib] && rdrEnabled) {
+				// NSLog(@"[Pock] rdr fix enabled");
+				maskHeight = 192;
+			} 
+
+			CGRect maskRect = CGRectMake(backgroundView.frame.origin.x+10, backgroundView.frame.origin.y, backgroundView.frame.size.width-20, maskHeight);
+			
+			CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+			shapeLayer.path = [UIBezierPath bezierPathWithRoundedRect:maskRect cornerRadius: backgroundView.layer.cornerRadius].CGPath;
+			shapeLayer.fillColor = [UIColor blackColor].CGColor;
+			
+			[maskLayer addSublayer:shapeLayer];
+			
+			self.layer.mask = maskLayer;
+		}
+	}
 %end
 
 %hook SBRootFolderDockIconListView
@@ -175,7 +221,7 @@ void prefThings(){
 		}
 
 		if(arg1.size.height == 92){
-			CGRect newFrame = CGRectMake(arg1.origin.x , arg1.origin.y, touchableWidth, arg1.size.height); // hacky way to set width 
+			CGRect newFrame = CGRectMake(0 , arg1.origin.y, touchableWidth, arg1.size.height); // hacky way to set width 
 			// NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
 			%orig(newFrame);
 			return;
