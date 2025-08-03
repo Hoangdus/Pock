@@ -14,7 +14,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>Only donate if you pirated and have pirate's remorse 😉</string>
+			<string>Donate if you pirated this 🥰</string>
 		</dict>
 		<dict>
 			<key>action</key>
@@ -55,6 +55,36 @@
 			<string>ENABLED</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSStaticTextCell</string>
+			<key>label</key>
+			<string>ICON_PER_PAGE</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSegmentCell</string>
+			<key>default</key>
+			<real>1</real>
+			<key>defaults</key>
+			<string>com.hoangdus.pockpref</string>
+			<key>PostNotification</key>
+			<string>com.hoangdus.pockpref-updated</string>
+			<key>key</key>
+			<string>IconPerPage</string>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>validValues</key>
+			<array>
+				<real>4</real>
+				<real>5</real>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>4</string>
+				<string>5</string>
+			</array>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -109,36 +139,6 @@
 			<string>DISABLE_PAGING_WHEN_EDIT</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSStaticTextCell</string>
-			<key>label</key>
-			<string>ICON_PER_PAGE</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSegmentCell</string>
-			<key>default</key>
-			<real>1</real>
-			<key>defaults</key>
-			<string>com.hoangdus.pockpref</string>
-			<key>PostNotification</key>
-			<string>com.hoangdus.pockpref-updated</string>
-			<key>key</key>
-			<string>IconPerPage</string>
-			<key>detail</key>
-			<string>PSListItemsController</string>
-			<key>validValues</key>
-			<array>
-				<real>4</real>
-				<real>5</real>
-			</array>
-			<key>validTitles</key>
-			<array>
-				<string>4</string>
-				<string>5</string>
-			</array>
 		</dict>
 		<dict>
 			<key>cell</key>
