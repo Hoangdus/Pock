@@ -27,7 +27,8 @@ UIScrollView *cPockIconScrollView = nil;
 CGFloat touchableWidth = 375;
 CGFloat touchableHeight = 92;
 CGFloat iconSizeWidth = 0;
-CGPoint oldScrollPosision = CGPointZero;
+CGPoint oldScrollPosition = CGPointZero;
+int oldIconCount = 0;
 CGFloat iconWidthDivider = 0.73;
 CGFloat indexThresholdThreshold = 80;
 BOOL isEditingHomeScreen = false;
@@ -255,10 +256,11 @@ void prefThings(){
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
 
 		if(arg1 && scrollToEndWhenEdit){
-			oldScrollPosision = cPockIconScrollView.contentOffset;
+			oldScrollPosition = cPockIconScrollView.contentOffset;
+			oldIconCount = iconCount;
 			[cPockIconScrollView setContentOffset:CGPointMake(touchableWidth-375, 0) animated:animateScrollToEndWhenEdit];			
-		}else if(!arg1 && scrollToEndWhenEdit && scrollBackFromEndAfterEdit && [[self icons] count] != iconColumns){
-			[cPockIconScrollView setContentOffset:oldScrollPosision animated:animateScrollToEndWhenEdit];			
+		}else if(!arg1 && scrollToEndWhenEdit && scrollBackFromEndAfterEdit && (oldIconCount <= iconCount)){
+			[cPockIconScrollView setContentOffset:oldScrollPosition animated:animateScrollToEndWhenEdit];			
 		}
 
 		[self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, touchableWidth, self.frame.size.height)];
