@@ -119,7 +119,7 @@ void prefThings(){
 			frameHeight = [arg1 frame].size.height;
 		}
 		
-		// NSLog(@"[Pock] initWithDockListView arg1 Frame: %@", NSStringFromCGRect([arg1 frame]));
+		NSLog(@"[Pock] initWithDockListView arg1 Frame: %@", NSStringFromCGRect([arg1 frame]));
 		self.pockIconScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(frameX, frameY, frameWidth, frameHeight)];
 		// self.pockIconScrollView.center = CGPointMake(frameWidth/2, frameHeight/2); //fix for RoundDock Remastered
 
@@ -158,22 +158,23 @@ void prefThings(){
 	-(void)layoutSubviews{
 		%orig;
 		if(iPhoneXFix){
-			UIView *backgroundView = [self backgroundView];
+			UIView *backgroundView = MSHookIvar<UIView *>(self, "_backgroundView");
 			// self.pockIconScrollView.layer.cornerRadius = backgroundView.layer.cornerRadius;
 			// if(@available(iOS 13.0, *)){
 			// 	self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
 			// }
 
-
 			CALayer *maskLayer = [CALayer layer];
 			CGFloat maskHeight = backgroundView.frame.size.height;
 			maskLayer.frame = self.bounds;
 			
-			NSString *RDRDylib = @"/var/jb/usr/lib/TweakInject/RoundDockRemastered.dylib";
+			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
+			NSLog(@"[Pock] rdr dylib path: %@", rdrDylibPath);
+
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 
-			if ([fileManager fileExistsAtPath:RDRDylib] && rdrEnabled) {
-				// NSLog(@"[Pock] rdr fix enabled");
+			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+				NSLog(@"[Pock] rdr fix enabled");
 				maskHeight = 192;
 			} 
 

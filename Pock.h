@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <libroot.h>
 
 typedef struct SBIconCoordinate {
 	long long row;
