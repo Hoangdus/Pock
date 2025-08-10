@@ -10,7 +10,7 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = Pock
 
 $(TWEAK_NAME)_FILES = Pock.xm
-$(TWEAK_NAME)_CFLAGS = -fobjc-arc
+$(TWEAK_NAME)_CFLAGS = -fobjc-arc -Wno-vla-cxx-extension
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
