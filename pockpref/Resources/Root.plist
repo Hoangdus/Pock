@@ -22,7 +22,7 @@
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
-			<string>MY_TWITTER</string>
+			<string>My Twitter (X)</string>
 		</dict>
 		<dict>
 			<key>action</key>
@@ -30,15 +30,15 @@
 			<key>cell</key>
 			<string>PSButtonCell</string>
 			<key>label</key>
-			<string>BUY_A_FANTA</string>
+			<string>Donate (Buy me a Fanta)</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Pock</string>
-			<key>footerText</key>
-			<string>Also use this if you are using RoundDockRemastered</string>
+			<!-- <key>footerText</key>
+			<string>Also use this if you are using RoundDockRemastered</string> -->
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -52,7 +52,7 @@
 			<key>key</key>
 			<string>PockEnabled</string>
 			<key>label</key>
-			<string>ENABLED</string>
+			<string>Enable</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -60,7 +60,7 @@
 			<key>cell</key>
 			<string>PSStaticTextCell</string>
 			<key>label</key>
-			<string>ICON_PER_PAGE</string>
+			<string>Icon per-page</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -98,7 +98,7 @@
 			<key>key</key>
 			<string>iPhoneXFix</string>
 			<key>label</key>
-			<string>IPHONE_X_FIX</string>
+			<string>iPhone X Dock</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -106,7 +106,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>PAGING</string>
+			<string>Paging</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -120,7 +120,7 @@
 			<key>key</key>
 			<string>DockPagingEnabled</string>
 			<key>label</key>
-			<string>DOCK_PAGING</string>
+			<string>Dock paging</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -136,7 +136,7 @@
 			<key>key</key>
 			<string>DisablePagingWhenEdit</string>
 			<key>label</key>
-			<string>DISABLE_PAGING_WHEN_EDIT</string>
+			<string>Disable paging when edit</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -144,7 +144,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>EXTRA</string>
+			<string>Extra</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -158,7 +158,7 @@
 			<key>key</key>
 			<string>ScrollBounce</string>
 			<key>label</key>
-			<string>SCROLL_BOUNCE</string>
+			<string>Scroll bounce</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -174,7 +174,7 @@
 			<key>key</key>
 			<string>ShowIndicator</string>
 			<key>label</key>
-			<string>SHOW_SCROLLING_INDICATOR</string>
+			<string>Scrolling indicator</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -190,7 +190,7 @@
 			<key>key</key>
 			<string>SnapToIcon</string>
 			<key>label</key>
-			<string>SNAP_TO_ICON</string>
+			<string>Icon snapping</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -206,7 +206,7 @@
 			<key>key</key>
 			<string>DisableSnappingWhenEdit</string>
 			<key>label</key>
-			<string>DISABLE_SNAPPING_WHEN_EDIT</string>
+			<string>Disable snapping when edit</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -214,7 +214,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>QOL_MAYBE</string>
+			<string>Quality of life</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -228,7 +228,7 @@
 			<key>key</key>
 			<string>ScrollToEndWhenEdit</string>
 			<key>label</key>
-			<string>SCROLL_TO_END_WHEN_EDIT</string>
+			<string>Scroll to end when edit</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -244,7 +244,7 @@
 			<key>key</key>
 			<string>ScrollBackAfterEdit</string>
 			<key>label</key>
-			<string>SCROLL_BACK_AFTER_EDIT</string>
+			<string>Scroll back after edit</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
@@ -260,7 +260,7 @@
 			<key>key</key>
 			<string>AnimateWhenAutoScroll</string>
 			<key>label</key>
-			<string>ANIMATE_AUTO_SCROLL</string>
+			<string>Animate auto scroll</string>
 			<key>cellClass</key>
 			<string>PockSwitchCell</string>
 		</dict>
