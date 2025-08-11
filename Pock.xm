@@ -12,7 +12,7 @@ bool scrollBackFromEndAfterEdit = false;
 bool animateScrollToEndWhenEdit = true;
 
 bool verticalPage = false;//not use for now
-bool doublePageRow = true;//vertical page only
+bool doublePageRow = false;//vertical page only
 
 int iconColumns = 4;
 CGFloat infiniteSpacing = 27;//only reconmended for 4 icon columns or less (27 for stock ios look when at 4 col, 13 for 5 col)
@@ -24,6 +24,7 @@ bool disableSnapToIconWhenEdit = false;
 
 // SBDockView *cSBDockView = nil;
 UIScrollView *cPockIconScrollView = nil;
+UIView *cBackgroundView = nil;
 CGFloat touchableWidth = 375;
 CGFloat touchableHeight = 92;
 CGFloat iconSizeWidth = 0;
@@ -44,11 +45,6 @@ void prefThings(){
 
 	if(iconColumns == 5){
 		infiniteSpacing = 13;
-
-		if(iPhoneXFix){
-			infiniteSpacing = 12.5;
-		}
-
 		indexThresholdThreshold = 70;
 	}
 
@@ -91,7 +87,6 @@ void prefThings(){
 
 @end
 
-//TODO: icon snapping when dockPaging is off
 %hook SBDockView
 	
 	%property (nonatomic, retain) UIScrollView *pockIconScrollView;
@@ -103,26 +98,28 @@ void prefThings(){
 		[arg1 removeFromSuperview]; //remove original icon list view
 
 		//init a UIScrollView
-		CGFloat frameX = [arg1 frame].origin.x;
-		CGFloat frameY = 0;
-		CGFloat frameWidth = [arg1 frame].size.width;
-		CGFloat frameHeight = 0;
+		// CGFloat frameX = [arg1 frame].origin.x;
+		// CGFloat frameY = 0;
+		// CGFloat frameWidth = [arg1 frame].size.width;
+		// CGFloat frameHeight = 0;
 		
-		if(verticalPage){
-			frameY = [arg1 frame].origin.y + 4;
-		}else{
-			frameY = [arg1 frame].origin.y;
-		}
+		// if(verticalPage){
+		// 	frameY = [arg1 frame].origin.y + 4;
+		// }else{
+		// 	frameY = [arg1 frame].origin.y;
+		// }
 
-		if(doublePageRow && verticalPage){
-			frameHeight = [arg1 frame].size.height * 1.75 + 3;
-		}else{
-			frameHeight = [arg1 frame].size.height;
-		}
+		// if(doublePageRow && verticalPage){
+		// 	frameHeight = [arg1 frame].size.height * 1.75 + 3;
+		// }else{
+		// 	frameHeight = [arg1 frame].size.height;
+		// }
 		
 		NSLog(@"[Pock] initWithDockListView arg1 Frame: %@", NSStringFromCGRect([arg1 frame]));
-		self.pockIconScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(frameX, frameY, frameWidth, frameHeight)];
-		// self.pockIconScrollView.center = CGPointMake(frameWidth/2, frameHeight/2); //fix for RoundDock Remastered
+		// NSLog(@"[Pock] SBDockView parent bounds: %@", NSStringFromCGRect(self.superview.bounds));
+
+		// self.pockIconScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(frameX, frameY, frameWidth, frameHeight)];
+		self.pockIconScrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
 
 		self.pockIconScrollView.pagingEnabled = dockPaging;
 		self.pockIconScrollView.bounces = isScrollBounceEnabled;
@@ -158,44 +155,49 @@ void prefThings(){
 
 	-(void)layoutSubviews{
 		%orig;
-		if(iPhoneXFix){
-			UIView *backgroundView = MSHookIvar<UIView *>(self, "_backgroundView");
-			// self.pockIconScrollView.layer.cornerRadius = backgroundView.layer.cornerRadius;
-			// if(@available(iOS 13.0, *)){
-			// 	self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
-			// }
+		if(@available(iOS 14.0, *)){
+			if(@available(iOS 16.0, *)){
+				return;
+			}
 
-			CALayer *maskLayer = [CALayer layer];
-			CGFloat maskHeight = backgroundView.frame.size.height;
-			maskLayer.frame = self.bounds;
-			
+			UIView *backgroundView = MSHookIvar<UIView *>(self, "_backgroundView");
+			cBackgroundView = backgroundView;
+			NSLog(@"[Pock] backgroundView Frame: %@", NSStringFromCGRect([backgroundView frame]));
+
+			CGFloat backgroundViewXPos = backgroundView.frame.origin.x;
+			CGFloat backgroundViewYPos = backgroundView.frame.origin.y;
+			CGFloat backgroundViewWidth = backgroundView.frame.size.width;
+			CGFloat backgroundViewHeight = 92;
+
 			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
-			NSLog(@"[Pock] rdr dylib path: %@", rdrDylibPath);
+			// NSLog(@"[Pock] rdr dylib path: %@", rdrDylibPath);
 
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 
 			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
-				NSLog(@"[Pock] rdr fix enabled");
-				maskHeight = 192;
+				// NSLog(@"[Pock] rdr fix enabled");
+				backgroundViewXPos = backgroundViewXPos + 10;
+				backgroundViewWidth = backgroundViewWidth - 20;
+				backgroundViewHeight = backgroundViewHeight + 100;
 			} 
 
-			CGRect maskRect = CGRectMake(backgroundView.frame.origin.x+10, backgroundView.frame.origin.y, backgroundView.frame.size.width-20, maskHeight);
-			
-			CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-			shapeLayer.path = [UIBezierPath bezierPathWithRoundedRect:maskRect cornerRadius: backgroundView.layer.cornerRadius].CGPath;
-			shapeLayer.fillColor = [UIColor blackColor].CGColor;
-			
-			[maskLayer addSublayer:shapeLayer];
-			
-			self.layer.mask = maskLayer;
+			self.pockIconScrollView.frame = CGRectMake(backgroundViewXPos, backgroundViewYPos, backgroundViewWidth, backgroundViewHeight);
+
+			self.pockIconScrollView.layer.cornerRadius = backgroundView.layer.cornerRadius;
+			self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
 		}
 	}
 %end
 
 %hook SBRootFolderDockIconListView
 
-	-(void)didMoveToWindow{
+	-(void)layoutSubviews{
 		%orig;
+		NSLog(@"[Pock] backgroundView 2 bounds: %@", NSStringFromCGRect([cBackgroundView bounds]));
+		NSLog(@"[Pock] SBRootFolderDockIconListView bounds: %@", NSStringFromCGRect([self bounds]));
+		if([self isEditing]){
+			return;
+		}
 		NSInteger iconCount = [[self icons] count];
 		if(verticalPage){
 			touchableHeight = 750;
@@ -204,31 +206,28 @@ void prefThings(){
 		}
 		touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:dockPaging]; //hacky way to set SBDockView width		
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
-		// [self setFrame:CGRectZero];
+		[self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, touchableWidth, self.frame.size.height)];
 	}
 
 	//not very ideal, needs improve later
-	-(void)setFrame:(CGRect)arg1{
-		// NSLog(@"[Pock] setFrame arg 1: %@", NSStringFromCGRect(arg1));
-		// NSLog(@"[Pock] is dock: %d", [self isDock]);
-		%orig;
-		if(verticalPage){
-			if(arg1.origin.y == 4 && (arg1.size.height == 92 || arg1.size.height == 164)){
-				CGRect newFrame = CGRectMake(arg1.origin.x , arg1.origin.y - 4, arg1.size.width, touchableHeight); // hacky way to set width 
-				// NSLog(@"[Pock] arg 1: %@", NSStringFromCGRect(arg1));
-				// NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
-				%orig(newFrame);
-				return;
-			}
-		}
+	// -(void)setFrame:(CGRect)arg1{
+	// 	// NSLog(@"[Pock] setFrame arg 1: %@", NSStringFromCGRect(arg1));
+	// 	// NSLog(@"[Pock] is dock: %d", [self isDock]);
+	// 	%orig;
+	// 	if(verticalPage){
+	// 		if(arg1.origin.y == 4 && (arg1.size.height == 92 || arg1.size.height == 164)){
+	// 			CGRect newFrame = CGRectMake(arg1.origin.x , arg1.origin.y - 4, arg1.size.width, touchableHeight); // hacky way to set width 
+	// 			// NSLog(@"[Pock] arg 1: %@", NSStringFromCGRect(arg1));
+	// 			// NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
+	// 			%orig(newFrame);
+	// 			return;
+	// 		}
+	// 	}
 
-		if(arg1.size.height == 92){
-			CGRect newFrame = CGRectMake(0 , arg1.origin.y, touchableWidth, arg1.size.height); // hacky way to set width 
-			// NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
-			%orig(newFrame);
-			return;
-		}
-	}
+	// 	CGRect newFrame = CGRectMake(0 , arg1.origin.y, touchableWidth, arg1.size.height); // hacky way to set width 
+	// 	// NSLog(@"[Pock] new frame: %@", NSStringFromCGRect(newFrame));
+	// 	%orig(newFrame);	
+	// }
 
 	//set touchable area width and UIScrollView contentWidth after finish editting homescreen
 	-(void)setEditing:(BOOL)arg1{
@@ -341,9 +340,9 @@ void prefThings(){
 			return iconCount * (iconSize.width + iconSpacing) + iconSpacing;
 		}
 		if (iconCount % iconColumns == 0){
-			return cPockIconScrollView.frame.size.width * ceil(iconCount / iconColumns);
+			return cBackgroundView.frame.size.width * ceil(iconCount / iconColumns);
 		}
-		return cPockIconScrollView.frame.size.width * (ceil(iconCount / iconColumns) + 1);
+		return cBackgroundView.frame.size.width * (ceil(iconCount / iconColumns) + 1);
 	}
 
 %end
