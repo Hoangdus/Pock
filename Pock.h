@@ -32,13 +32,13 @@ typedef struct SBIconCoordinate {
 @end
 
 @interface SBDockIconListView : SBIconListView
+    @property (nonatomic,readonly) CGSize alignmentIconSize;
 	+(double)defaultHeight;
 	-(CGPoint)originForIconAtCoordinate:(SBIconCoordinate)arg1;	
+	-(CGFloat)calculateDockFrameWidth:(CGFloat)iconSpacing iconCount:(NSInteger)iconCount dockPaging:(bool)dockPaging;
 @end
 
 @interface SBRootFolderDockIconListView : SBDockIconListView
-    @property (nonatomic,readonly) CGSize alignmentIconSize;
-	-(CGFloat)calculateDockFrameWidth:(CGFloat)iconSpacing iconCount:(NSInteger)iconCount dockPaging:(bool)dockPaging;
 @end
 
 @interface SBIconListGridLayoutConfiguration : NSObject
