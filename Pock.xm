@@ -158,10 +158,18 @@ void rdrPrefThings(){
 			if(isHomeButtonDevice){
 				pockIconScrollViewXPos = 0;
 				pockIconScrollViewWidth = self.bounds.size.width;
+				self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
 				if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+					if(!dockPaging){
+						self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
+					}
 					pockIconScrollViewXPos = pockIconScrollViewXPos + 10;
 					pockIconScrollViewWidth = pockIconScrollViewWidth - 20;
 				} 
+			}else{
+				if(!dockPaging){
+					self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
+				}
 			}
 
 			self.pockIconScrollView.frame = CGRectMake(pockIconScrollViewXPos, pockIconScrollViewYPos, pockIconScrollViewWidth, pockIconScrollViewHeight);
@@ -198,10 +206,18 @@ void rdrPrefThings(){
 			if(isHomeButtonDevice){
 				pockIconScrollViewXPos = 0;
 				pockIconScrollViewWidth = self.bounds.size.width;
+				self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
 				if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+					if(!dockPaging){
+						self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
+					}
 					pockIconScrollViewXPos = pockIconScrollViewXPos + 10;
 					pockIconScrollViewWidth = pockIconScrollViewWidth - 20;
 				} 
+			}else{
+				if(!dockPaging){
+					self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
+				}
 			}
 
 			self.pockIconScrollView.frame = CGRectMake(pockIconScrollViewXPos, pockIconScrollViewYPos, pockIconScrollViewWidth, pockIconScrollViewHeight);
