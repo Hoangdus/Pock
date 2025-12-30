@@ -193,15 +193,19 @@ void rdrPrefThings(){
 			CGFloat screenHeight = [[UIScreen mainScreen] nativeBounds].size.height;
 			BOOL isHomeButtonDevice = screenHeight == 1920 || screenHeight == 1334 || screenHeight == 1136;
 
-			self.pockIconScrollView.layer.cornerRadius = backgroundView.layer.cornerRadius;
-			self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
-
 			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 
 			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
 				self.pockIconScrollView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
-			} 
+				CGFloat backgroundViewCornerRadius = backgroundView.layer.cornerRadius;
+				if(backgroundViewCornerRadius != 0){
+					self.pockIconScrollView.layer.cornerRadius = backgroundViewCornerRadius;
+					self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
+				} 
+			}else{
+				self.pockIconScrollView.layer.cornerRadius = 0;
+			}
 
 			if(isHomeButtonDevice){
 				pockIconScrollViewXPos = 0;
