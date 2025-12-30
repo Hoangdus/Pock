@@ -24,7 +24,7 @@ bool disableSnapToIconWhenEdit = false;
 
 // SBDockView *cSBDockView = nil;
 UIScrollView *cPockIconScrollView = nil;
-UIView *cBackgroundView = nil;
+CGFloat pockIconScrollViewWidth = 0;
 CGFloat touchableWidth = 375;
 CGFloat touchableHeight = 92;
 CGFloat iconSizeWidth = 0;
@@ -56,10 +56,11 @@ void prefThings(){
 	isScrollBounceEnabled = (prefs && [prefs objectForKey:@"ScrollBounce"] ? [[prefs valueForKey:@"ScrollBounce"] boolValue] : false );
 	snapToIcon = (prefs && [prefs objectForKey:@"SnapToIcon"] ? [[prefs valueForKey:@"SnapToIcon"] boolValue] : false );
 	disableSnapToIconWhenEdit = (prefs && [prefs objectForKey:@"DisableSnappingWhenEdit"] ? [[prefs valueForKey:@"DisableSnappingWhenEdit"] boolValue] : false );
+}
 
+void rdrPrefThings(){
 	NSDictionary *rdrprefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.thomz.rounddockremasteredpreferences"];
 	rdrEnabled = (rdrprefs && [rdrprefs objectForKey:@"enableSwitch"] ? [[rdrprefs valueForKey:@"enableSwitch"] boolValue] : false );
-
 }
 
 %group Pock
@@ -135,12 +136,35 @@ void prefThings(){
 		%orig;
 		if(@available(iOS 16.0, *)){
 			UIView *backgroundView = MSHookIvar<UIView *>(self, "_backgroundView");
-			cBackgroundView = backgroundView;
-			// NSLog(@"[Pock] backgroundView Frame: %@", NSStringFromCGRect([backgroundView frame]));
-			// NSLog(@"[Pock] touchable width: %f", touchableWidth);
-			self.pockIconScrollView.frame = [backgroundView frame];
+
+			CGFloat pockIconScrollViewXPos = backgroundView.frame.origin.x;
+			CGFloat pockIconScrollViewYPos = 4;
+			pockIconScrollViewWidth = backgroundView.frame.size.width;
+			CGFloat	pockIconScrollViewHeight = 92;
+
+			CGFloat screenHeight = [[UIScreen mainScreen] nativeBounds].size.height;
+			BOOL isHomeButtonDevice = screenHeight == 1920 || screenHeight == 1334 || screenHeight == 1136;
+
 			self.pockIconScrollView.layer.cornerRadius = backgroundView.layer.cornerRadius;
 			self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
+
+			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+
+			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+				self.pockIconScrollView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+			} 
+
+			if(isHomeButtonDevice){
+				pockIconScrollViewXPos = 0;
+				pockIconScrollViewWidth = self.bounds.size.width;
+				if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+					pockIconScrollViewXPos = pockIconScrollViewXPos + 10;
+					pockIconScrollViewWidth = pockIconScrollViewWidth - 20;
+				} 
+			}
+
+			self.pockIconScrollView.frame = CGRectMake(pockIconScrollViewXPos, pockIconScrollViewYPos, pockIconScrollViewWidth, pockIconScrollViewHeight);
 		}
 	}
 
@@ -152,29 +176,35 @@ void prefThings(){
 			}
 
 			UIView *backgroundView = MSHookIvar<UIView *>(self, "_backgroundView");
-			cBackgroundView = backgroundView;
 
-			CGFloat backgroundViewXPos = backgroundView.frame.origin.x;
-			CGFloat backgroundViewYPos = 0;
-			CGFloat backgroundViewWidth = backgroundView.frame.size.width;
-			CGFloat backgroundViewHeight = 92;
+			CGFloat pockIconScrollViewXPos = backgroundView.frame.origin.x;
+			CGFloat pockIconScrollViewYPos = 4;
+			pockIconScrollViewWidth = backgroundView.frame.size.width;
+			CGFloat	pockIconScrollViewHeight = 92;
 
-			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
-			// NSLog(@"[Pock] rdr dylib path: %@", rdrDylibPath);
-
-			NSFileManager *fileManager = [NSFileManager defaultManager];
-
-			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
-				// NSLog(@"[Pock] rdr fix enabled");
-				backgroundViewXPos = backgroundViewXPos + 10;
-				backgroundViewWidth = backgroundViewWidth - 20;
-				backgroundViewHeight = backgroundViewHeight + 100;
-			} 
-
-			self.pockIconScrollView.frame = CGRectMake(backgroundViewXPos, backgroundViewYPos, backgroundViewWidth, backgroundViewHeight);
+			CGFloat screenHeight = [[UIScreen mainScreen] nativeBounds].size.height;
+			BOOL isHomeButtonDevice = screenHeight == 1920 || screenHeight == 1334 || screenHeight == 1136;
 
 			self.pockIconScrollView.layer.cornerRadius = backgroundView.layer.cornerRadius;
 			self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
+
+			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+
+			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+				self.pockIconScrollView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+			} 
+
+			if(isHomeButtonDevice){
+				pockIconScrollViewXPos = 0;
+				pockIconScrollViewWidth = self.bounds.size.width;
+				if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+					pockIconScrollViewXPos = pockIconScrollViewXPos + 10;
+					pockIconScrollViewWidth = pockIconScrollViewWidth - 20;
+				} 
+			}
+
+			self.pockIconScrollView.frame = CGRectMake(pockIconScrollViewXPos, pockIconScrollViewYPos, pockIconScrollViewWidth, pockIconScrollViewHeight);
 		}
 	}
 %end
@@ -219,7 +249,7 @@ void prefThings(){
 		}
 		touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:dockPaging]; //hacky way to set SBDockView width		
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
-		[self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, touchableWidth, self.frame.size.height)];
+		[self setFrame:CGRectMake(self.frame.origin.x, 0, touchableWidth, self.frame.size.height)];
 	}
 
 	//set touchable area width and UIScrollView contentWidth after finish editting homescreen
@@ -281,8 +311,8 @@ void prefThings(){
 		CGSize iconSize = [self alignmentIconSize];
 		unsigned long long columnPoint = (arg1.x - infiniteSpacing)/(iconSize.width + infiniteSpacing);
 		if(dockPaging){
-			int pageNumber = ceil(arg1.x/cPockIconScrollView.frame.size.width);
-			CGFloat offset = (cPockIconScrollView.frame.size.width - (iconSize.width + infiniteSpacing) * iconColumns)/2;
+			int pageNumber = ceil(arg1.x/pockIconScrollViewWidth);
+			CGFloat offset = (pockIconScrollViewWidth - (iconSize.width + infiniteSpacing) * iconColumns)/2;
 			CGFloat newX = offset * ((pageNumber - 1) * 2 -1);
 			columnPoint = (arg1.x - newX - infiniteSpacing/2) / (iconSize.width + infiniteSpacing);
 			// NSLog(@"[Pock] point: %llu", columnPoint);
@@ -303,7 +333,7 @@ void prefThings(){
 		CGFloat y = %orig.y;
 		if(dockPaging){
 			//thanks Nepeta for the math 
-			CGFloat offset = (cPockIconScrollView.frame.size.width - (iconSize.width + infiniteSpacing) * iconColumns)/2;//add an offset for every 4 icons (big space every 4 icons)
+			CGFloat offset = (pockIconScrollViewWidth - (iconSize.width + infiniteSpacing) * iconColumns)/2;//add an offset for every 4 icons (big space every 4 icons)
 			x = offset * (ceil((arg1.col - 1) / iconColumns) * 2 + 1);
 			CGFloat newX = ((iconSize.width + infiniteSpacing) * (arg1.col - 1)) + x + infiniteSpacing * 0.5;
 			return CGPointMake(newX, y);
@@ -319,9 +349,9 @@ void prefThings(){
 			return iconCount * (iconSize.width + iconSpacing) + iconSpacing;
 		}
 		if (iconCount % iconColumns == 0){
-			return cBackgroundView.frame.size.width * ceil(iconCount / iconColumns);
+			return pockIconScrollViewWidth * ceil(iconCount / iconColumns);
 		}
-		return cBackgroundView.frame.size.width * (ceil(iconCount / iconColumns) + 1);
+		return pockIconScrollViewWidth * (ceil(iconCount / iconColumns) + 1);
 	}
 
 %end
@@ -343,7 +373,7 @@ void prefThings(){
 		}
 		touchableWidth = [self calculateDockFrameWidth:infiniteSpacing iconCount:iconCount dockPaging:dockPaging]; //hacky way to set SBDockView width		
 		cPockIconScrollView.contentSize = CGSizeMake(touchableWidth, 92);
-		[self setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, touchableWidth, self.frame.size.height)];
+		[self setFrame:CGRectMake(self.frame.origin.x, 0, touchableWidth, self.frame.size.height)];
 	}
 
 	//set touchable area width and UIScrollView contentWidth after finish editting homescreen
@@ -405,8 +435,8 @@ void prefThings(){
 		CGSize iconSize = [self alignmentIconSize];
 		unsigned long long columnPoint = (arg1.x - infiniteSpacing)/(iconSize.width + infiniteSpacing);
 		if(dockPaging){
-			int pageNumber = ceil(arg1.x/cPockIconScrollView.frame.size.width);
-			CGFloat offset = (cPockIconScrollView.frame.size.width - (iconSize.width + infiniteSpacing) * iconColumns)/2;
+			int pageNumber = ceil(arg1.x/pockIconScrollViewWidth);
+			CGFloat offset = (pockIconScrollViewWidth - (iconSize.width + infiniteSpacing) * iconColumns)/2;
 			CGFloat newX = offset * ((pageNumber - 1) * 2 -1);
 			columnPoint = (arg1.x - newX - infiniteSpacing/2) / (iconSize.width + infiniteSpacing);
 			// NSLog(@"[Pock] point: %llu", columnPoint);
@@ -427,7 +457,7 @@ void prefThings(){
 		CGFloat y = %orig.y;
 		if(dockPaging){
 			//thanks Nepeta for the math 
-			CGFloat offset = (cPockIconScrollView.frame.size.width - (iconSize.width + infiniteSpacing) * iconColumns)/2;//add an offset for every 4 icons (big space every 4 icons)
+			CGFloat offset = (pockIconScrollViewWidth - (iconSize.width + infiniteSpacing) * iconColumns)/2;//add an offset for every 4 icons (big space every 4 icons)
 			x = offset * (ceil((arg1.row - 1) / iconColumns) * 2 + 1);
 			CGFloat newX = ((iconSize.width + infiniteSpacing) * (arg1.row - 1)) + x + infiniteSpacing * 0.5;
 			return CGPointMake(newX, y);
@@ -443,9 +473,9 @@ void prefThings(){
 			return iconCount * (iconSize.width + iconSpacing) + iconSpacing;
 		}
 		if (iconCount % iconColumns == 0){
-			return cBackgroundView.frame.size.width * ceil(iconCount / iconColumns);
+			return pockIconScrollViewWidth * ceil(iconCount / iconColumns);
 		}
-		return cBackgroundView.frame.size.width * (ceil(iconCount / iconColumns) + 1);
+		return pockIconScrollViewWidth * (ceil(iconCount / iconColumns) + 1);
 	}
 
 %end
@@ -455,6 +485,9 @@ void prefThings(){
 %ctor{
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)prefThings, CFSTR("com.hoangdus.pockpref-updated"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 	prefThings();
+
+	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)rdrPrefThings, CFSTR("com.thomz.rounddockremasteredpreferences/ReloadPrefs"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+	rdrPrefThings();
 
 	if(pockEnabled){
 		%init(Pock);
