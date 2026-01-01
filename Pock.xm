@@ -65,6 +65,32 @@ void rdrPrefThings(){
 
 %group Pock
 
+BOOL isHomeButtonDevice(){
+	CGFloat screenHeight = [[UIScreen mainScreen] nativeBounds].size.height;
+	return screenHeight == 1920 || screenHeight == 1334 || screenHeight == 1136;
+}
+
+BOOL rdrCheck(){
+	NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	return [fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled;
+}
+
+CGFloat edgeInset(){
+	CGFloat baseInset = 10;
+	CGFloat addedInset = (iconColumns - 4) * 1.5;
+
+	if(!dockPaging && !isHomeButtonDevice()){
+		return baseInset + addedInset;
+	}
+
+	if(isHomeButtonDevice() && rdrCheck() && !dockPaging){
+		return baseInset + addedInset;
+	}
+
+	return 0;
+}
+
 @implementation PockIconScrollViewDelegate
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
@@ -77,13 +103,16 @@ void rdrPrefThings(){
 	CGFloat indexThreshold = -((targetContentOffset->x - infiniteSpacing) - (ceil(targetContentOffset->x / iconWidth) * iconWidth));
 	// NSLog(@"[Pock] index++: %f", indexThreshold);
 
+	CGFloat xOffset = 0;
 	if (indexThreshold < iconWidth * iconWidthDivider) {
-		targetContentOffset->x = index * iconWidth;
+		xOffset = index * iconWidth;
 	}else if(indexThreshold < indexThresholdThreshold){
-		targetContentOffset->x = (index - 1) * iconWidth;
+		xOffset = (index - 1) * iconWidth;
 	}else{
-		targetContentOffset->x = index * iconWidth;
+		xOffset = index * iconWidth;
 	}
+
+	targetContentOffset->x = xOffset + edgeInset();
 }
 
 @end
@@ -142,12 +171,6 @@ void rdrPrefThings(){
 			pockIconScrollViewWidth = backgroundView.frame.size.width;
 			CGFloat	pockIconScrollViewHeight = 92;
 
-			CGFloat screenHeight = [[UIScreen mainScreen] nativeBounds].size.height;
-			BOOL isHomeButtonDevice = screenHeight == 1920 || screenHeight == 1334 || screenHeight == 1136;
-
-			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
-			NSFileManager *fileManager = [NSFileManager defaultManager];
-
 			CGFloat backgroundViewCornerRadius = backgroundView.layer.cornerRadius;
 			//fix corner radius reset when changing appearance 
 			if(backgroundViewCornerRadius != 0){
@@ -155,29 +178,22 @@ void rdrPrefThings(){
 				self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
 			}
 
-			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+			if (rdrCheck()) {
 				self.pockIconScrollView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner; 
 			}
 
-			if(isHomeButtonDevice){
+			if(isHomeButtonDevice()){
 				pockIconScrollViewXPos = 0;
 				pockIconScrollViewWidth = self.bounds.size.width;
-				self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
-				if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
-					if(!dockPaging){
-						self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
-					}
+				if (rdrCheck()) {
 					pockIconScrollViewXPos = pockIconScrollViewXPos + 10;
 					pockIconScrollViewWidth = pockIconScrollViewWidth - 20;
 				} else{
 					self.pockIconScrollView.layer.cornerRadius = backgroundViewCornerRadius;
 				}
-			}else{
-				if(!dockPaging){
-					self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
-				}
 			}
 
+			self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -edgeInset(), 0, -edgeInset());
 			self.pockIconScrollView.frame = CGRectMake(pockIconScrollViewXPos, pockIconScrollViewYPos, pockIconScrollViewWidth, pockIconScrollViewHeight);
 		}
 	}
@@ -196,12 +212,6 @@ void rdrPrefThings(){
 			pockIconScrollViewWidth = backgroundView.frame.size.width;
 			CGFloat	pockIconScrollViewHeight = 92;
 
-			CGFloat screenHeight = [[UIScreen mainScreen] nativeBounds].size.height;
-			BOOL isHomeButtonDevice = screenHeight == 1920 || screenHeight == 1334 || screenHeight == 1136;
-
-			NSString *rdrDylibPath = JBROOT_PATH_NSSTRING(@"/usr/lib/TweakInject/RoundDockRemastered.dylib");
-			NSFileManager *fileManager = [NSFileManager defaultManager];
-
 			CGFloat backgroundViewCornerRadius = backgroundView.layer.cornerRadius;
 			//fix corner radius reset when changing appearance 
 			if(backgroundViewCornerRadius != 0){
@@ -209,29 +219,22 @@ void rdrPrefThings(){
 				self.pockIconScrollView.layer.cornerCurve = kCACornerCurveContinuous;
 			}
 
-			if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
+			if (rdrCheck()) {
 				self.pockIconScrollView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner; 
 			}
 
-			if(isHomeButtonDevice){
+			if(isHomeButtonDevice()){
 				pockIconScrollViewXPos = 0;
 				pockIconScrollViewWidth = self.bounds.size.width;
-				self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
-				if ([fileManager fileExistsAtPath:rdrDylibPath] && rdrEnabled) {
-					if(!dockPaging){
-						self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
-					}
+				if (rdrCheck()) {
 					pockIconScrollViewXPos = pockIconScrollViewXPos + 10;
 					pockIconScrollViewWidth = pockIconScrollViewWidth - 20;
 				} else{
 					self.pockIconScrollView.layer.cornerRadius = backgroundViewCornerRadius;
 				}
-			}else{
-				if(!dockPaging){
-					self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -10, 0, -10);
-				}
 			}
 
+			self.pockIconScrollView.contentInset = UIEdgeInsetsMake(0, -edgeInset(), 0, -edgeInset());
 			self.pockIconScrollView.frame = CGRectMake(pockIconScrollViewXPos, pockIconScrollViewYPos, pockIconScrollViewWidth, pockIconScrollViewHeight);
 		}
 	}
