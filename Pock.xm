@@ -1,7 +1,6 @@
 #import "Pock.h"
 
 bool pockEnabled = false;
-bool iPhoneXFix = false;
 bool rdrEnabled = false;
 
 bool dockPaging = false;
@@ -37,7 +36,6 @@ BOOL isEditingHomeScreen = false;
 void prefThings(){
 	NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.hoangdus.pockpref"];
 	pockEnabled = (prefs && [prefs objectForKey:@"PockEnabled"] ? [[prefs valueForKey:@"PockEnabled"] boolValue] : false );
-	iPhoneXFix = (prefs && [prefs objectForKey:@"iPhoneXFix"] ? [[prefs valueForKey:@"iPhoneXFix"] boolValue] : false );
 
 	dockPaging = (prefs && [prefs objectForKey:@"DockPagingEnabled"] ? [[prefs valueForKey:@"DockPagingEnabled"] boolValue] : false );
 	disablePagingWhenEditing = (prefs && [prefs objectForKey:@"DisablePagingWhenEdit"] ? [[prefs valueForKey:@"DisablePagingWhenEdit"] boolValue] : false );
